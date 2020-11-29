@@ -47,7 +47,6 @@ bool g_bTouchesWall[MAXPLAYERS + 1];
 bool g_bStrafeCount[MAXPLAYERS + 1];
 
 int g_iUsageMode[MAXPLAYERS + 1];
-int g_iTickCount[MAXPLAYERS + 1];
 int g_iTicksOnGround[MAXPLAYERS + 1];
 int g_iTouchTicks[MAXPLAYERS + 1];
 int g_iStrafeTick[MAXPLAYERS + 1];
@@ -94,6 +93,7 @@ public void OnPluginStart()
 	g_hCookieGainStats = RegClientCookie("ssj_gainstats", "ssj_gainstats", CookieAccess_Public);
 	g_hCookieEfficiency = RegClientCookie("ssj_efficiency", "ssj_efficiency", CookieAccess_Public);
 	g_hCookieTime = RegClientCookie("ssj_time", "ssj_time", CookieAccess_Public);
+	g_hCookieDeltaTime = RegClientCookie("ssj_deltatime", "ssj_deltatime", CookieAccess_Public);
 	g_hCookieDeltaTime = RegClientCookie("ssj_deltatime", "ssj_deltatime", CookieAccess_Public);
 	g_hCookieStrafeCount = RegClientCookie("ssj_strafecount", "ssj_strafecount", CookieAccess_Public);
 	g_hCookieStrafeSync = RegClientCookie("ssj_strafesync", "ssj_strafesync", CookieAccess_Public);
@@ -173,9 +173,9 @@ public void OnClientCookiesCached(int client)
 		SetCookie(client, g_hCookieEfficiency, false);
 		SetCookie(client, g_hCookieTime, false);
 		SetCookie(client, g_hCookieDeltaTime, false);
+		SetCookie(client, g_hCookieDeltaTime, false);
 		SetCookie(client, g_hCookieStrafeCount, false);
 		SetCookie(client, g_hCookieStrafeSync, false);
-		
 		SetCookie(client, g_hCookieDefaultsSet, true);
 	}
 	
@@ -229,7 +229,6 @@ public void OnClientPutInServer(int client)
 	g_iTicksOnGround[client] = 0;
 	g_iStrafeCount[client] = 0;
 	g_iOldSSJTarget[client] = 0;
-	g_iTickCount[client] = 0;
 	
 	SDKHook(client, SDKHook_Touch, OnTouch);
 }
@@ -276,7 +275,6 @@ void UpdateStats(int client)
 	GetClientAbsOrigin(target, origin);
 	
 	g_fRawGain[client] = 0.0;
-	g_iTickCount[client] = 0;
 	g_iStrafeTick[client] = 0;
 	g_iSyncedTick[client] = 0;
 	g_iStrafeCount[client] = 0;
@@ -352,7 +350,7 @@ Action ShowSSJMenu(int client, int item = 0)
 	menu.AddItem("height", (g_bHeightDiff[client]) ? "[x] Height difference":"[ ] Height difference");
 	menu.AddItem("gain", (g_bGainStats[client]) ? "[x] Gain percentage":"[ ] Gain percentage");
 	menu.AddItem("efficiency", (g_bEfficiency[client]) ? "[x] Strafe efficiency":"[ ] Strafe efficiency");
-	menu.AddItem("time", (g_bTime[client]) ? "[x] Time":"[ ] Time");
+	menu.AddItem("time", (g_bTime[client]) ? "[x] Time counter":"[ ] Time counter");
 	menu.AddItem("time Δ", (g_bDeltaTime[client]) ? "[x] Time Δ":"[ ] Time Δ");
 	menu.AddItem("strafe", (g_bStrafeCount[client]) ? "[x] Strafe":"[ ] Strafe");
 	menu.AddItem("sync", (g_bStrafeSync[client]) ? "[x] Synchronization":"[ ] Synchronization");
@@ -460,7 +458,6 @@ void SSJ_GetStats(int client, float vel[3], float angles[3])
 	GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", velocity);
 	
 	g_iStrafeTick[client]++;
-	g_iTickCount[client]++;
 	
 	float speedmulti = GetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue");
 	
@@ -651,58 +648,54 @@ bool SSJ_PrintStats(int client, int target)
 	coeffsum = RoundToFloor(coeffsum * 100.0 + 0.5) / 100.0;
 	efficiency = RoundToFloor(efficiency * 100.0 + 0.5) / 100.0;
 	
-	int tickcount = g_iTickCount[client];
-	
 	char sMessage[192];
-	FormatEx(sMessage, 192, "J: %s%i", gS_ChatStrings.sStyle, g_iJump[target]);
+	FormatEx(sMessage, 192, "J: %s%i", gS_ChatStrings.sVariable, g_iJump[target]);
+	
+	float time = Shavit_GetClientTime(target);
+	char sTime[32];
 	
 	if (g_bCurrentSpeed[client])
 	{
-		Format(sMessage, 192, "%s %s| Spd: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, RoundToFloor(GetVectorLength(velocity)));
+		Format(sMessage, 192, "%s %s| Spd: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, RoundToFloor(GetVectorLength(velocity)));
 	}
 	
 	if (g_iJump[target] > 1)
 	{
 		if (g_bHeightDiff[client])
 		{
-			Format(sMessage, 192, "%s %s| H Δ: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, RoundToFloor(origin[2]) - RoundToFloor(g_fInitialHeight[target]));
+			Format(sMessage, 192, "%s %s| H Δ: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, RoundToFloor(origin[2]) - RoundToFloor(g_fInitialHeight[target]));
 		}
 		
 		if (g_bGainStats[client])
 		{
-			Format(sMessage, 192, "%s %s| Gn: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, coeffsum);
+			Format(sMessage, 192, "%s %s| Gn: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, coeffsum);
 		}
 		
 		if (g_bStrafeSync[client])
 		{
-			Format(sMessage, 192, "%s %s| Snc: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, 100.0 * g_iSyncedTick[target] / g_iStrafeTick[target]);
+			Format(sMessage, 192, "%s %s| Snc: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, 100.0 * g_iSyncedTick[target] / g_iStrafeTick[target]);
 		}
 		
 		if (g_bEfficiency[client])
 		{
-			Format(sMessage, 192, "%s %s| Eff: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, efficiency);
+			Format(sMessage, 192, "%s %s| Eff: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, efficiency);
 		}
 		
 		if (g_bStrafeCount[client])
 		{
-			Format(sMessage, 192, "%s %s| Strf: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, g_iStrafeCount[target]);
+			Format(sMessage, 192, "%s %s| Strf: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, g_iStrafeCount[target]);
 		}
 		
 		if (g_bTime[client])
 		{
-			float time = Shavit_GetClientTime(target);
-			
-			char sTime[32];
 			FormatSeconds(time, sTime, 32, true);
-			Format(sMessage, 192, "%s %s| Time: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
+			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, sTime);
 		}
 		
 		if (g_bDeltaTime[client])
 		{
-			float time = tickcount * GetTickInterval();
-			char sTime[32];
-			FormatSeconds(time, sTime, sizeof(sTime), false);
-			Format(sMessage, 192, "%s %s| Time Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
+			FormatSeconds(time, sTime, 32, false);
+			Format(sMessage, 192, "%s %s| T Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 	}
 	
