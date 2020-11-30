@@ -665,7 +665,7 @@ bool SSJ_PrintStats(int client, int target)
 		if (g_bTime[client])
 		{
 			float time = Shavit_GetClientTime(target);
-			char sTime[32];	
+			char sTime[32];
 			FormatSeconds(time, sTime, 32, true);
 			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
@@ -674,7 +674,7 @@ bool SSJ_PrintStats(int client, int target)
 		{
 			float time = tickcount * GetTickInterval();
 			char sTime[32];
-			FormatSeconds(time, sTime, sizeof(sTime), false);
+			FormatSeconds(time, sTime, sizeof(sTime), true);
 			Format(sMessage, 192, "%s %s| T Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 	}
@@ -710,7 +710,7 @@ bool SSJ_PrintStats(int client, int target)
 		if (g_bTime[client])
 		{
 			float time = Shavit_GetClientTime(target);
-			char sTime[32];	
+			char sTime[32];
 			FormatSeconds(time, sTime, 32, true);
 			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
@@ -719,7 +719,7 @@ bool SSJ_PrintStats(int client, int target)
 		{
 			float time = tickcount * GetTickInterval();
 			char sTime[32];
-			FormatSeconds(time, sTime, 32, true);
+			FormatSeconds(time, sTime, sizeof(sTime), true);
 			Format(sMessage, 192, "%s %s| T Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 	}
