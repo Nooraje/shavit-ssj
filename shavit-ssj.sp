@@ -95,7 +95,6 @@ public void OnPluginStart()
 	g_hCookieEfficiency = RegClientCookie("ssj_efficiency", "ssj_efficiency", CookieAccess_Public);
 	g_hCookieTime = RegClientCookie("ssj_time", "ssj_time", CookieAccess_Public);
 	g_hCookieDeltaTime = RegClientCookie("ssj_deltatime", "ssj_deltatime", CookieAccess_Public);
-	g_hCookieDeltaTime = RegClientCookie("ssj_deltatime", "ssj_deltatime", CookieAccess_Public);
 	g_hCookieStrafeCount = RegClientCookie("ssj_strafecount", "ssj_strafecount", CookieAccess_Public);
 	g_hCookieStrafeSync = RegClientCookie("ssj_strafesync", "ssj_strafesync", CookieAccess_Public);
 	g_hCookieDefaultsSet = RegClientCookie("ssj_defaults", "ssj_defaults", CookieAccess_Public);
@@ -173,7 +172,6 @@ public void OnClientCookiesCached(int client)
 		SetCookie(client, g_hCookieGainStats, true);
 		SetCookie(client, g_hCookieEfficiency, false);
 		SetCookie(client, g_hCookieTime, false);
-		SetCookie(client, g_hCookieDeltaTime, false);
 		SetCookie(client, g_hCookieDeltaTime, false);
 		SetCookie(client, g_hCookieStrafeCount, false);
 		SetCookie(client, g_hCookieStrafeSync, false);
@@ -666,8 +664,8 @@ bool SSJ_PrintStats(int client, int target)
 	{
 		if (g_bTime[client])
 		{
-			float time = tickcount * GetTickInterval();
-			char sTime[32];
+			float time = Shavit_GetClientTime(target);
+			char sTime[32];	
 			FormatSeconds(time, sTime, 32, true);
 			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
@@ -680,7 +678,7 @@ bool SSJ_PrintStats(int client, int target)
 			Format(sMessage, 192, "%s %s| T Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 	}
-
+	
 	
 	if (g_iJump[target] > 1)
 	{
@@ -711,8 +709,8 @@ bool SSJ_PrintStats(int client, int target)
 		
 		if (g_bTime[client])
 		{
-			float time = tickcount * GetTickInterval();
-			char sTime[32];
+			float time = Shavit_GetClientTime(target);
+			char sTime[32];	
 			FormatSeconds(time, sTime, 32, true);
 			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
@@ -721,7 +719,7 @@ bool SSJ_PrintStats(int client, int target)
 		{
 			float time = tickcount * GetTickInterval();
 			char sTime[32];
-			FormatSeconds(time, sTime, sizeof(sTime), false);
+			FormatSeconds(time, sTime, 32, true);
 			Format(sMessage, 192, "%s %s| T Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 	}
