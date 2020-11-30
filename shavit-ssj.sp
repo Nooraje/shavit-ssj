@@ -656,40 +656,40 @@ bool SSJ_PrintStats(int client, int target)
 	
 	if (g_bCurrentSpeed[client])
 	{
-		Format(sMessage, 192, "%s %s| Spd: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, RoundToFloor(GetVectorLength(velocity)));
+		Format(sMessage, 192, "%s %s| Spd: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, RoundToFloor(GetVectorLength(velocity)));
 	}
 	
 	if (g_iJump[target] > 1)
 	{
 		if (g_bHeightDiff[client])
 		{
-			Format(sMessage, 192, "%s %s| H Δ: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, RoundToFloor(origin[2]) - RoundToFloor(g_fInitialHeight[target]));
+			Format(sMessage, 192, "%s %s| H Δ: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, RoundToFloor(origin[2]) - RoundToFloor(g_fInitialHeight[target]));
 		}
 		
 		if (g_bGainStats[client])
 		{
-			Format(sMessage, 192, "%s %s| Gn: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, coeffsum);
+			Format(sMessage, 192, "%s %s| Gn: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, coeffsum);
 		}
 		
 		if (g_bStrafeSync[client])
 		{
-			Format(sMessage, 192, "%s %s| Snc: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, 100.0 * g_iSyncedTick[target] / g_iStrafeTick[target]);
+			Format(sMessage, 192, "%s %s| Snc: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, 100.0 * g_iSyncedTick[target] / g_iStrafeTick[target]);
 		}
 		
 		if (g_bEfficiency[client])
 		{
-			Format(sMessage, 192, "%s %s| Eff: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, efficiency);
+			Format(sMessage, 192, "%s %s| Eff: %s%.2f%%", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, efficiency);
 		}
 		
 		if (g_bStrafeCount[client])
 		{
-			Format(sMessage, 192, "%s %s| Strf: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, g_iStrafeCount[target]);
+			Format(sMessage, 192, "%s %s| Strf: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, g_iStrafeCount[target]);
 		}
 		
 		if (g_bTime[client])
 		{
 			FormatSeconds(time, sTime, 32, true);
-			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sVariable, sTime);
+			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 		
 		if (g_bDeltaTime[client])
