@@ -351,8 +351,7 @@ Action ShowSSJMenu(int client, int item = 0)
 	menu.AddItem("height", (g_bHeightDiff[client]) ? "[x] Height difference":"[ ] Height difference");
 	menu.AddItem("gain", (g_bGainStats[client]) ? "[x] Gain percentage":"[ ] Gain percentage");
 	menu.AddItem("efficiency", (g_bEfficiency[client]) ? "[x] Strafe efficiency":"[ ] Strafe efficiency");
-	menu.AddItem("time", (g_bTime[client]) ? "[x] Time counter":"[ ] Time counter");
-	menu.AddItem("time Δ", (g_bDeltaTime[client]) ? "[x] Time Δ":"[ ] Time Δ");
+	menu.AddItem("fjt", (g_bTime[client]) ? "[x] FJT":"[ ] FJT");
 	menu.AddItem("strafe", (g_bStrafeCount[client]) ? "[x] Strafe":"[ ] Strafe");
 	menu.AddItem("sync", (g_bStrafeSync[client]) ? "[x] Synchronization":"[ ] Synchronization");
 	
@@ -424,17 +423,11 @@ public int SSJ_MenuHandler(Menu menu, MenuAction action, int param1, int param2)
 			
 			case 9:
 			{
-				g_bDeltaTime[param1] = !g_bDeltaTime[param1];
-				SetCookie(param1, g_hCookieDeltaTime, g_bDeltaTime[param1]);
-			}
-			
-			case 10:
-			{
 				g_bStrafeCount[param1] = !g_bStrafeCount[param1];
 				SetCookie(param1, g_hCookieStrafeCount, g_bStrafeCount[param1]);
 			}
 			
-			case 11:
+			case 10:
 			{
 				g_bStrafeSync[param1] = !g_bStrafeSync[param1];
 				SetCookie(param1, g_hCookieStrafeSync, g_bStrafeSync[param1]);
@@ -650,7 +643,7 @@ bool SSJ_PrintStats(int client, int target)
 	coeffsum = RoundToFloor(coeffsum * 100.0 + 0.5) / 100.0;
 	efficiency = RoundToFloor(efficiency * 100.0 + 0.5) / 100.0;
 	
-	int tickcount = g_iTickCount[client];
+	// int tickcount = g_iTickCount[client]; i have no idea why it was here i was drunk
 	
 	char sMessage[192];
 	FormatEx(sMessage, 192, "J: %s%i", gS_ChatStrings.sVariable, g_iJump[target]);
@@ -662,20 +655,14 @@ bool SSJ_PrintStats(int client, int target)
 	
 	if (g_iJump[target] == 1)
 	{
+		FormatEx(sMessage, 192, "PreStrafe: %s%i", gS_ChatStrings.sStyle, RoundToFloor(GetVectorLength(velocity)));
+			
 		if (g_bTime[client])
 		{
 			float time = Shavit_GetClientTime(target);
 			char sTime[32];
 			FormatSeconds(time, sTime, 32, true);
-			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
-		}
-		
-		if (g_bDeltaTime[client])
-		{
-			float time = tickcount * GetTickInterval();
-			char sTime[32];
-			FormatSeconds(time, sTime, sizeof(sTime), true);
-			Format(sMessage, 192, "%s %s| T Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
+			Format(sMessage, 192, "%s %s| FJT: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 	}
 	
@@ -705,22 +692,6 @@ bool SSJ_PrintStats(int client, int target)
 		if (g_bStrafeCount[client])
 		{
 			Format(sMessage, 192, "%s %s| Strf: %s%i", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, g_iStrafeCount[target]);
-		}
-		
-		if (g_bTime[client])
-		{
-			float time = Shavit_GetClientTime(target);
-			char sTime[32];
-			FormatSeconds(time, sTime, 32, true);
-			Format(sMessage, 192, "%s %s| T: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
-		}
-		
-		if (g_bDeltaTime[client])
-		{
-			float time = tickcount * GetTickInterval();
-			char sTime[32];
-			FormatSeconds(time, sTime, sizeof(sTime), true);
-			Format(sMessage, 192, "%s %s| T Δ: %s%s", sMessage, gS_ChatStrings.sText, gS_ChatStrings.sStyle, sTime);
 		}
 	}
 	
